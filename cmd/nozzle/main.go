@@ -12,17 +12,17 @@ import (
 func main() {
 	caPath := flag.String(
 		"ca",
-		"/var/vcap/jobs/reference_nozzle/config/certs/ca.crt",
+		"certs/ca.crt",
 		"Path to the CA cert used for mutual TLS",
 	)
 	certPath := flag.String(
 		"cert",
-		"/var/vcap/jobs/reference_nozzle/config/certs/refnozzle.crt",
+		"certs/refnozzle.crt",
 		"Path to the client cert",
 	)
 	keyPath := flag.String(
 		"key",
-		"/var/vcap/jobs/reference_nozzle/config/certs/refnozzle.key",
+		"certs/refnozzle.key",
 		"Path to the client key",
 	)
 	src := flag.String(
@@ -38,7 +38,6 @@ func main() {
 	shardID := flag.String(
 		"shard-id",
 		"refnozzle",
-
 		"Unique ID that identifies this nozzle",
 	)
 	flag.Parse()
