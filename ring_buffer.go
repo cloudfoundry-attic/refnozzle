@@ -2,7 +2,7 @@ package refnozzle
 
 import (
 	"code.cloudfoundry.org/diodes"
-	"code.cloudfoundry.org/refnozzle/rpc/loggregator_v2"
+	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 )
 
 type RingBuffer struct {

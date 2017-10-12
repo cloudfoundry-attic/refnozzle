@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"code.cloudfoundry.org/refnozzle/rpc/loggregator_v2"
+	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
