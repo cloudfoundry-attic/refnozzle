@@ -52,6 +52,9 @@ func main() {
 		log.Fatalf("failed to create mutual TLS config: %v", err)
 	}
 
+	log.Print("Starting reference nozzle...")
+	defer log.Print("Closing reference nozzle.")
+
 	buf := refnozzle.NewRingBuffer(10000, diodes.AlertFunc(func(n int) {
 		log.Println("dropped %d envelopes. Consider scaling the number of"+
 			"nozzle instances up, or the downstream consumer needs to be faster...", n)
