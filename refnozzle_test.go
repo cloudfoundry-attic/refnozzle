@@ -1,9 +1,11 @@
 package refnozzle_test
 
 import (
+	"context"
+
 	"code.cloudfoundry.org/diodes"
-	"code.cloudfoundry.org/refnozzle"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"code.cloudfoundry.org/refnozzle"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -43,15 +45,16 @@ var _ = Describe("RefNozzle", func() {
 				},
 			},
 		}
-		c := refnozzle.NewConnector(
-			eventsOnly,
+		c := refnozzle.NewEnvelopeStreamConnector(
 			producer.addr,
 			tlsConf,
 		)
 
+		rx := c.Stream(context.Background(), eventsOnly)
+
 		r := refnozzle.NewRepeater(
 			buf,
-			c,
+			rx,
 		)
 		go r.Start()
 

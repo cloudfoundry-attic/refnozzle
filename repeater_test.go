@@ -3,8 +3,8 @@ package refnozzle_test
 import (
 	"sync"
 
-	"code.cloudfoundry.org/refnozzle"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"code.cloudfoundry.org/refnozzle"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -12,10 +12,11 @@ import (
 var _ = Describe("Repeater", func() {
 	It("writes envelopes from the stream to the buffer", func() {
 		buf := newSpyEnvelopeBuffer()
-		stream := newSpyStream()
-		stream.batch = []*loggregator_v2.Envelope{
-			{SourceId: "a"},
-			{SourceId: "b"},
+		stream := func() []*loggregator_v2.Envelope {
+			return []*loggregator_v2.Envelope{
+				{SourceId: "a"},
+				{SourceId: "b"},
+			}
 		}
 		r := refnozzle.NewRepeater(buf, stream)
 		go r.Start()
@@ -51,16 +52,4 @@ func (s *spyEnvelopeBuffer) writeEnvelopes() []*loggregator_v2.Envelope {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.writeEnvelopes_
-}
-
-type spyStream struct {
-	batch []*loggregator_v2.Envelope
-}
-
-func newSpyStream() *spyStream {
-	return &spyStream{}
-}
-
-func (s *spyStream) Receive() []*loggregator_v2.Envelope {
-	return s.batch
 }

@@ -1,8 +1,8 @@
 package refnozzle_test
 
 import (
-	"code.cloudfoundry.org/refnozzle"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"code.cloudfoundry.org/refnozzle"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

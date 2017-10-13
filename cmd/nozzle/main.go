@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 
@@ -76,14 +77,17 @@ func main() {
 			},
 		},
 	}
-	c := refnozzle.NewConnector(
-		eventsOnly,
+
+	c := refnozzle.NewEnvelopeStreamConnector(
 		*src,
 		tlsConfig,
 	)
+
+	rx := c.Stream(context.Background(), eventsOnly)
+
 	r := refnozzle.NewRepeater(
 		buf,
-		c,
+		rx,
 	)
 	r.Start()
 }

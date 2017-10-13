@@ -1,8 +1,10 @@
 package refnozzle_test
 
 import (
-	"code.cloudfoundry.org/refnozzle"
+	"context"
+
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"code.cloudfoundry.org/refnozzle"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -22,13 +24,14 @@ var _ = Describe("Connector", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		req := &loggregator_v2.EgressBatchRequest{ShardId: "some-id"}
-		c := refnozzle.NewConnector(
-			req,
+		c := refnozzle.NewEnvelopeStreamConnector(
 			producer.addr,
 			tlsConf,
 		)
 
-		Expect(len(c.Receive())).NotTo(BeZero())
+		rx := c.Stream(context.Background(), req)
+
+		Expect(len(rx())).NotTo(BeZero())
 		Expect(producer.actualReq()).To(Equal(req))
 	})
 
@@ -48,15 +51,15 @@ var _ = Describe("Connector", func() {
 		)
 		Expect(err).NotTo(HaveOccurred())
 
-		c := refnozzle.NewConnector(
-			&loggregator_v2.EgressBatchRequest{},
+		c := refnozzle.NewEnvelopeStreamConnector(
 			producer.addr,
 			tlsConf,
 		)
 
 		go func() {
+			rx := c.Stream(context.Background(), &loggregator_v2.EgressBatchRequest{})
 			for {
-				c.Receive()
+				rx()
 			}
 		}()
 

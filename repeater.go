@@ -8,20 +8,16 @@ import (
 
 type Repeater struct {
 	buf    EnvelopeBufferWriter
-	stream Stream
+	stream EnvelopeStream
 }
 
 type EnvelopeBufferWriter interface {
 	Write(*loggregator_v2.Envelope)
 }
 
-type Stream interface {
-	Receive() []*loggregator_v2.Envelope
-}
-
 func NewRepeater(
 	buf EnvelopeBufferWriter,
-	s Stream,
+	s EnvelopeStream,
 ) *Repeater {
 	return &Repeater{
 		buf:    buf,
@@ -31,7 +27,7 @@ func NewRepeater(
 
 func (r *Repeater) Start() {
 	for {
-		envs := r.stream.Receive()
+		envs := r.stream()
 		for _, e := range envs {
 			log.Printf("Received event envelope: %+v", e)
 			r.buf.Write(e)

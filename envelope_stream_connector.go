@@ -11,18 +11,35 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-type Connector struct {
-	conn   *grpc.ClientConn
-	client loggregator_v2.EgressClient
-	rx     loggregator_v2.Egress_BatchedReceiverClient
-	req    *loggregator_v2.EgressBatchRequest
+type EnvelopeStreamConnector struct {
+	addr    string
+	tlsConf *tls.Config
 }
 
-func NewConnector(
-	req *loggregator_v2.EgressBatchRequest,
+func NewEnvelopeStreamConnector(
 	addr string,
 	c *tls.Config,
-) *Connector {
+) *EnvelopeStreamConnector {
+	return &EnvelopeStreamConnector{
+		addr:    addr,
+		tlsConf: c,
+	}
+}
+
+type EnvelopeStream func() []*loggregator_v2.Envelope
+
+func (c *EnvelopeStreamConnector) Stream(ctx context.Context, req *loggregator_v2.EgressBatchRequest) EnvelopeStream {
+	return newStream(ctx, c.addr, req, c.tlsConf).recv
+}
+
+type stream struct {
+	ctx    context.Context
+	req    *loggregator_v2.EgressBatchRequest
+	client loggregator_v2.EgressClient
+	rx     loggregator_v2.Egress_BatchedReceiverClient
+}
+
+func newStream(ctx context.Context, addr string, req *loggregator_v2.EgressBatchRequest, c *tls.Config) *stream {
 	conn, err := grpc.Dial(
 		addr,
 		grpc.WithTransportCredentials(credentials.NewTLS(c)),
@@ -35,22 +52,22 @@ func NewConnector(
 
 	client := loggregator_v2.NewEgressClient(conn)
 
-	return &Connector{
+	return &stream{
+		ctx:    ctx,
 		req:    req,
-		conn:   conn,
 		client: client,
 	}
 }
 
-func (c *Connector) Receive() []*loggregator_v2.Envelope {
+func (s *stream) recv() []*loggregator_v2.Envelope {
 	for {
-		ok := c.connect(context.TODO())
+		ok := s.connect(s.ctx)
 		if !ok {
 			return nil
 		}
-		batch, err := c.rx.Recv()
+		batch, err := s.rx.Recv()
 		if err != nil {
-			c.rx = nil
+			s.rx = nil
 			continue
 		}
 
@@ -58,7 +75,7 @@ func (c *Connector) Receive() []*loggregator_v2.Envelope {
 	}
 }
 
-func (c *Connector) connect(ctx context.Context) bool {
+func (c *stream) connect(ctx context.Context) bool {
 	for {
 		select {
 		case <-ctx.Done():
