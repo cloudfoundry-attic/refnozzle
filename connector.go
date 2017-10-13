@@ -75,6 +75,7 @@ func (c *Connector) connect(ctx context.Context) bool {
 			)
 
 			if err != nil {
+				log.Println("Error connecting to Logs Provider: %s", err)
 				time.Sleep(50 * time.Millisecond)
 				continue
 			}

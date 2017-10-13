@@ -46,7 +46,7 @@ func main() {
 		*certPath,
 		*keyPath,
 		*caPath,
-		"rlp",
+		"reverselogproxy",
 	)
 	if err != nil {
 		log.Fatalf("failed to create mutual TLS config: %v", err)

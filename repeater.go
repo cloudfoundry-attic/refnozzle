@@ -1,6 +1,8 @@
 package refnozzle
 
 import (
+	"log"
+
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 )
 
@@ -31,6 +33,7 @@ func (r *Repeater) Start() {
 	for {
 		envs := r.stream.Receive()
 		for _, e := range envs {
+			log.Printf("Received event envelope: %+v", e)
 			r.buf.Write(e)
 		}
 	}

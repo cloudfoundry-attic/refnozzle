@@ -42,7 +42,7 @@ func (w *Writer) Start() {
 
 		resp, err := http.Post(w.addr, "application/json", bytes.NewReader(jd))
 		if err != nil {
-			log.Println("failed to POST")
+			log.Printf("Failed to POST: %s", err)
 			continue
 		}
 		defer resp.Body.Close()
@@ -52,7 +52,7 @@ func (w *Writer) Start() {
 				log.Printf("failed to read response body: %s", err)
 				continue
 			}
-			log.Printf("failed to POST: %s", data)
+			log.Printf("Unexpected status code %d: %s", resp.StatusCode, data)
 		}
 	}
 }
