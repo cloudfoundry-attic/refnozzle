@@ -3,7 +3,7 @@ package refnozzle_test
 import (
 	"context"
 
-	"code.cloudfoundry.org/diodes"
+	"code.cloudfoundry.org/go-diodes"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	"code.cloudfoundry.org/refnozzle"
 	. "github.com/onsi/ginkgo"
